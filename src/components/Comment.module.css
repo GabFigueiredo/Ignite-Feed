@@ -1,0 +1,59 @@
+.comment {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+}
+
+.comment img {
+    width: calc(3.75rem + 12px);
+    height: calc(3.75rem + 12px);
+    border-radius: 8px;
+}
+
+.comment + .comment {
+    margin-top: 1rem;
+}
+
+.wrapper {
+    width: 100%;
+}
+
+.commentContent {
+    width: 100%;
+    border-radius: 8px;
+    background-color: var(--gray-700);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.authorInfo p {
+    font-size: 1rem;
+    color: var(--white);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.authorInfo time {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-400)
+}
+
+.footer {
+    display: flex;
+    gap: 0.5rem;
+    color: var(--gray-400);
+    font-weight: bold;
+}
+
+.footer p:nth-of-type(2)::before {
+    content: "•";
+    margin: 0 0.5rem;
+}
