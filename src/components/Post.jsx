@@ -1,42 +1,123 @@
+import React, { useState } from 'react';
 import styles from './Post.module.css';
 import { Comment } from './Comment';
+import { format, formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-export function Post() {
+const templateComments = [
+    {
+        authorImageURL: 'https://github.com/GabFigueiredo.png',
+        authorName: 'Gabriel Figueiredo',
+        publishedAt: '2025-02-06 12:00:00',
+        content: "Hearts" 
+    },
+    {
+        authorImageURL: 'https://github.com/diego3g.png',
+        authorName: 'Diego Fernandes',
+        publishedAt: '2024-01-07 12:00:00',
+        content: "Boa! 👏" 
+    }
+]
+
+export function Post({ authorImageURL, authorName, authorRole, publishedAt, content }) {
+    const [comments, setComments] = useState(templateComments);
+    const [newMessage, setNewMessage] = useState('')
+
+    const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'",
+        { locale: ptBR}
+    );
+
+    const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+         locale: ptBR,
+         addSuffix: true, 
+        });
+
+    function handleCreateNewMessage(event) {
+        event.preventDefault()
+        setComments([...comments, {
+            authorImageURL: 'https://github.com/GabFigueiredo.png',
+            authorName: 'Gabriel Figueiredo',
+            publishedAt: '2025-02-06 12:00:00',
+            content: newMessage
+        }])
+        setNewMessage('')
+    }
+
+    function deleteComment(commentToDelete) {
+        const updatedComments = comments.filter(comment => comment.content !== commentToDelete);
+        setComments(updatedComments)
+    }
+
+    function handleMessageChange(event) {
+        event.target.setCustomValidity('')
+        setNewMessage(event.target.value);
+    }
+
+    function handleCreateNewMessageInvalid(event) {
+        event.target.setCustomValidity('Esse campo é obrigatório!')
+    }
+
+    const isNewCommentEmpty = newMessage.length === 0
+    
     return (
         <article className={styles.post}>
             <header>
                 <div className={styles.userInfo}>
-                    <img className={styles.avatar} src='https://github.com/GabFigueiredo.png'></img>
+                    <img className={styles.avatar} src={authorImageURL} alt={`${authorName}'s profile`}></img>
                     <div className={styles.author}>
-                        <strong>Gabriel Figueiredo</strong>
-                        <span>Web Developer</span>
+                        <strong>{authorName}</strong>
+                        <span>{authorRole}</span>
                     </div>
                 </div>
-                    <time dateTime='2024-04-02 17:09:47'>Publicado há 1h atrás</time>
+                    <time
+                        title={publishedDateFormatted}
+                        dateTime={publishedAt.toISOString()}>{publishedDateRelativeToNow}
+                    </time>
             </header>
             <div className={styles.content}>
-                <p>Fala galeraa 👋</p>
-                <p>Acabei de subir mais um projeto no meu portifa. É um projeto que fiz no NLW Return, evento da Rocketseat. O nome do projeto é DoctorCare 🚀</p>
-                <p>
-                    <a href=''>👉 jane.design/doctorcare</a>
-                </p>
-                <p>
-                    <a href=''>#novoprojeto</a>{' '}
-                    <a href=''>#nlw</a> {' '}
-                    <a href=''>#rocketseat</a>
-                </p>
+                {content.map((item, index) => {
+                    if (item.type === 'paragraph') {
+                        return <p key={index}>{item.content}</p>
+                    }
+                    if (item.type === 'link') {
+                        return <a key={index} href=''>{item.content}</a>
+                    }
+                })}
             </div>
+
             <footer className={styles.footer}>
                 <strong>Deixe seu feedback</strong>
-                <textarea placeholder='Nossa, adorei o projeto!'></textarea>
-                <div className={styles.wrapper}>
-                    <button type='submit'>Comentar</button>
-                </div>
+                <form onSubmit={handleCreateNewMessage}> 
+                    <textarea
+                        value={newMessage}
+                        onChange={handleMessageChange}
+                        placeholder='Nossa, adorei o projeto!'
+                        onInvalid={handleCreateNewMessageInvalid}
+                        required>
+                    </textarea>
+                    <div className={styles.wrapper}>
+                        <button
+                            type='submit'
+                            disabled={isNewCommentEmpty}
+                            >Comentar
+                        </button>
+                    </div>
+                </form>
             </footer>
             <div className={styles.commentList}>
-                <Comment />
-                <Comment />
-                <Comment /> 
+                {comments.map((comment, index) => {
+                    return (
+                        <Comment
+                            key={index}
+                            authorImageURL={comment.authorImageURL}
+                            authorName={comment.authorName}
+                            publishedAt={comment.publishedAt}
+                            content={comment.content}
+                            onDeleteComment={deleteComment}
+                            
+                        />
+                    )
+                })}
             </div>
         </article>
     )

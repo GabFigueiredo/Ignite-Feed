@@ -1,27 +1,58 @@
 import { ThumbsUp, Trash } from 'phosphor-react';
 import styles from './Comment.module.css';
+import { format, formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import React, { useState } from 'react';
 
-export function Comment() {
+export function Comment({ authorImageURL, authorName, publishedAt, content, onDeleteComment }) {
+    const [likes, setLikes] = useState(0)
+
+    const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'",
+            { locale: ptBR}
+        );
+
+    const publishedDateRelativeToNow = formatDistanceToNow(publishedAt,  {
+        locale: ptBR,
+        addSuffix: true,
+    })
+
+    function handleDeleteComment() {
+        onDeleteComment(content)
+    }
+
+    function handleLikeAction() {
+        setLikes(likes + 1)
+    }
+
     return (
             <div className={styles.comment}>
                 <div>
-                    <img src='https://github.com/GabFigueiredo.png'></img>
+                    <img src={authorImageURL}></img>
                 </div>
                 <div className={styles.wrapper}>
                     <div className={styles.commentContent}>
                         <header>
                             <div className={styles.authorInfo}>
-                                <p>Gabriel Figueiredo</p>
-                                <time dateTime='2024-04-02 17:09:47'>Publicado há 3h atrás</time>
+                                <p>{authorName}</p>
+                                <time 
+                                    title={publishedDateFormatted}
+                                    dateTime={publishedAt}>
+                                        {publishedDateRelativeToNow}
+                                </time>
                             </div>
-                            <Trash size={24}></Trash>
+                            <div className={styles.image}>
+                                <Trash 
+                                    size={24}
+                                    onClick={handleDeleteComment}
+                                />
+                            </div>
                         </header>
-                        <p>💜💜</p>
+                        <a>{content}</a>
                     </div>
                     <footer className={styles.footer}>
                         <ThumbsUp size={20}></ThumbsUp>
-                        <p>Curtir</p>
-                        <p>33</p>
+                        <button onClick={handleLikeAction}>Curtir</button>
+                        <p>{likes}</p>
                     </footer>
                 </div>
             </div>
